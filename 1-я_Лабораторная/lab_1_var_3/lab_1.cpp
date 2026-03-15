@@ -9,41 +9,24 @@
 using namespace std;
 using namespace chrono;
 
-void shakerSort(vector<double>& arr, long long& swaps, long long& passes) {
+void insertionSort(vector<double>& arr, long long& swaps, long long& passes) {
     swaps = 0;
     passes = 0;
     int n = arr.size();
-    bool swapped = true;
-    int start = 0;
-    int end = n - 1;
     
-    while (swapped) {
-        swapped = false;
-        passes++;
-
-        for (int i = start; i < end; ++i) {
-            if (arr[i] > arr[i + 1]) {
-                swap(arr[i], arr[i + 1]);
-                swaps++;
-                swapped = true;
-            }
+    for (int i = 1; i < n; i++) {
+        double key = arr[i];
+        int j = i - 1;
+        passes++; // Считаем каждый проход внешнего цикла
+        
+        // Перемещаем элементы большие key на одну позицию вперед
+        while (j >= 0 && arr[j] > key) {
+            arr[j + 1] = arr[j];
+            swaps++;
+            j--;
         }
-        
-        if (!swapped) break;
-        
-        swapped = false;
-        end--;
-        passes++;
-        
-        for (int i = end - 1; i >= start; --i) {
-            if (arr[i] > arr[i + 1]) {
-                swap(arr[i], arr[i + 1]);
-                swaps++;
-                swapped = true;
-            }
-        }
-        
-        start++;
+        arr[j + 1] = key;
+        if (j + 1 != i) swaps++; // Учитываем последнюю вставку как обмен
     }
 }
 
@@ -70,7 +53,7 @@ vector<TestResult> runTestSeries(int arraySize, int testsPerSeries,
         long long swaps, passes;
         
         auto start = high_resolution_clock::now();
-        shakerSort(arr, swaps, passes);
+        insertionSort(arr, swaps, passes);
         auto end = high_resolution_clock::now();
         
         auto duration = duration_cast<microseconds>(end - start);
@@ -108,7 +91,7 @@ void calculateStatistics(const vector<TestResult>& results,
 }
 
 double bigO(int n, double c) {
-    return c * n * n;
+    return c * n * n; // O(n²) для сортировки вставками
 }
 
 int main() 
@@ -129,7 +112,7 @@ int main()
     passFile << "Size,AvgPasses" << endl;
     
     cout << fixed << setprecision(3);
-    cout << "Начало тестирования сортировки перемешиванием\n" << endl;
+    cout << "Начало тестирования сортировки вставками\n" << endl;
     
     double c = 0.0001; 
     
